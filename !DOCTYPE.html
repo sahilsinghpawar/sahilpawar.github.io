@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <style>
+      body { margin: 0; overflow: hidden; }
+      /* Style for the custom scanning overlay if you choose to add one */
+      #scanning-overlay { position: absolute; z-index: 99; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); color: white; }
+      #scanning-overlay.hidden { display: none; }
+    </style>
+  </head>
+
+  <body>
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.001; filterBeta: 1000;" 
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <video id="portfolio-vid" src="./assets/portfolio.mp4" loop="true" crossorigin="anonymous"></video>
+        <img id="btn-icon" src="./assets/icon-web.png">
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="near: 10; far: 10000; objects: .clickable"></a-camera>
+
+      <a-entity id="card-target" mindar-image-target="targetIndex: 0">
+        
+        <a-video id="video-entity" src="#portfolio-vid" width="1" height="0.55" position="0.6 0 0" rotation="0 0 0"></a-video>
+
+        <a-image id="web-button" class="clickable" src="#btn-icon" position="0 -0.6 0.1" width="0.3" height="0.3"
+                 event-set__mouseenter="_target: #web-button; scale: 1.2 1.2 1.2"
+                 event-set__mouseleave="_target: #web-button; scale: 1 1 1"></a-image>
+
+      </a-entity>
+    </a-scene>
+
+    <script>
+      // Handle Interactions
+      document.addEventListener("DOMContentLoaded", () => {
+        const video = document.querySelector("#portfolio-vid");
+        const target = document.querySelector("#card-target");
+        const webBtn = document.querySelector("#web-button");
+
+        // Start video when card is found
+        target.addEventListener("targetFound", () => {
+          video.play();
+        });
+
+        // Pause video when card is lost to save battery
+        target.addEventListener("targetLost", () => {
+          video.pause();
+        });
+
+        // Click event for the button
+        webBtn.addEventListener("click", () => {
+          window.location.href = "https://yourportfolio.com";
+        });
+      });
+    </script>
+  </body>
+</html>
